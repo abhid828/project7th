@@ -13,29 +13,11 @@ from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV
-import streamlit as st
-
-start = '2010-01-01'
-end = '2019-12-31'
-yfin.pdr_override()
-df = pdr.get_data_yahoo('AAPL', start, end)
-df = df.reset_index()
-df = df.drop(['Date','Adj Close'],axis=1)
-data_training =pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
-data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70): int(len(df))])
-scaler = m(feature_range=(0,1))
-data_train_array = scaler.fit_transform(data_training)
-x_train, y_train = [], []
-for i in range(100, data_train_array.shape[0]):
-    x_train.append(data_train_array[i-100: i, 0])  # Take the first column of each slice
-    y_train.append(data_train_array[i, 0])
-x_train, y_train = np.array(x_train), np.array(y_train)
-x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=42)
-rf_model = RandomForestRegressor()
-rf_model.fit(x_train, y_train)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
+
+import streamlit as st
 
 st.title('Stock Trend Prediction')
 start = st.text_input('Enter START date', '2013-12-01')
@@ -76,17 +58,18 @@ plt.ylabel('Price')
 plt.legend()
 st.pyplot(fig)
 
-data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.80)])
-data_testing = pd.DataFrame(df['Close'][int(len(df)*0.80):int(len(df))])
+data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
+data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70):int(len(df))])
 
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler(feature_range=(0,1))
-
-
 data_training_array= scaler.fit_transform(data_training)
 
 
-model = rf_model
+
+from joblib import load
+model = load('rf_model.joblib')
+
 
 
 past_100_days = data_training.tail(100)
